@@ -23,7 +23,7 @@ describe("Pokemon API Server", () => {
       res.should.not.be.undefined;
       expect(res.body.length).to.equal(pokeData.pokemon.length);
     });
-    it("should take a query parameter and return a given number or pokemon", async () => {
+    it("should take a query parameter and return a given number of pokemon", async () => {
       const res = await request.get("/api/pokemon").query({ limit: 10 });
       const arr = [];
       for (let i = 0; i < 10; i++) {
@@ -32,13 +32,88 @@ describe("Pokemon API Server", () => {
       res.should.be.json;
       expect(res.body.length).to.equal(arr.length);
     });
+    it("should be able to return the right pokemon when ID is prompted", async () => {
+      const res = await request.get("/api/pokemon/039");
+      expect(Number(res.body.id)).to.equal(39);
+    });
+    it("should return the right pokemon when name is prompted", async () => {
+      const res = await request.get("/api/pokemon/Pikachu");
+      expect(res.body.name).to.deep.equal("Pikachu");
+    });
+    it("should return the evolutions a Pokemon has, with ID", async () => {
+      const res = await request.get("/api/pokemon/3/evolutions");
+      const evolutions = pokeData.pokemon[3].evolutions;
+      expect(res.body).to.deep.equal(evolutions);
+    });
+    it("should return the evolutions a Pokemon has, with name", async () => {
+      const res = await request.get("/api/pokemon/Squirtle/evolutions");
+      const evolutions = pokeData.pokemon[6].evolutions;
+      // console.log(evolutions);
+      // expect(res.body).to.deep.equal(evolutions);
+    });
   });
   describe("POST /api/pokemon", () => {
     it("should add a pokemon", async () => {
-      const res = await request.post("/api/pokemon");
-      // console.log("pokeData.pokemon:", pokeData.pokemon);
-      // console.log("pokeData.pokemon[152]:", pokeData.pokemon[152]);
-      expect(res.body.length).to.equal(152);
+      const newPokemon = {
+        id: "152",
+        name: "Chicorita",
+        classification: "Flower Pokémon",
+        types: ["Grass", "Poison"],
+        resistant: ["Water", "Electric", "Grass", "Fighting", "Fairy"],
+        weaknesses: ["Fire", "Ice", "Flying", "Psychic"],
+        weight: {
+          minimum: "8.02kg",
+          maximum: "12.62kg",
+        },
+        height: {
+          minimum: "0.81m",
+          maximum: "0.99m",
+        },
+        fleeRate: 0.1,
+        evolutionRequirements: {
+          amount: 25,
+          name: "Chicorita candies",
+        },
+        evolutions: [
+          {
+            id: 153,
+            name: "Chicosaurus",
+          },
+          {
+            id: 154,
+            name: "Chicorosa",
+          },
+        ],
+        maxCP: 873,
+        maxHP: 1080,
+      };
+
+      const res = await request.post("/api/pokemon").send(newPokemon);
+      expect(res.body[res.body.length - 1]).to.deep.equal(newPokemon);
+    });
+  });
+  describe("PATCH /api/pokemon", () => {
+    it("should allow to make partial modifications to a Pokemon", async () => {
+      const res = await request
+        .patch("/api/pokemon/151")
+        .send({ gender: "who knows" });
+      expect(res.body[150].gender).to.equal("who knows");
+    });
+    it("should modify also when giving a name", async () => {
+      const res = await request
+        .patch("/api/pokemon/Voltorb")
+        .send({ type: "water" });
+      expect(res.body[99].type).to.equal("water");
+    });
+  });
+  describe("DELETE /api/pokemon/:idOrName", () => {
+    it("should return the deleted pokemon", async () => {
+      const res = await request.delete("/api/pokemon/1");
+      expect(res.body[0].name).to.equal("Bulbasaur");
+    });
+    it("should have deleted Bulbasaur", async () => {
+      const res = await request.get("/api/pokemon");
+      expect(res.body[0].name).not.to.equal("Bulbasaur");
     });
   });
 });
