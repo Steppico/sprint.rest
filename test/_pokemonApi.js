@@ -40,16 +40,15 @@ describe("Pokemon API Server", () => {
       const res = await request.get("/api/pokemon/Pikachu");
       expect(res.body.name).to.deep.equal("Pikachu");
     });
-    it("should return the evolutions a Pokemon has, with ID", async () => {
+    it("should return the evolutions a Pokemon has, by ID", async () => {
       const res = await request.get("/api/pokemon/3/evolutions");
       const evolutions = pokeData.pokemon[3].evolutions;
       expect(res.body).to.deep.equal(evolutions);
     });
-    it("should return the evolutions a Pokemon has, with name", async () => {
-      const res = await request.get("/api/pokemon/Squirtle/evolutions");
-      const evolutions = pokeData.pokemon[6].evolutions;
-      // console.log(evolutions);
-      // expect(res.body).to.deep.equal(evolutions);
+    it("should return the evolutions a Pokemon has, by name", async () => {
+      const res = await request.get("/api/pokemon/Pikachu/evolutions");
+      const evolutions = pokeData.pokemon[24].evolutions;
+      expect(res.body).to.deep.equal(evolutions);
     });
   });
   describe("POST /api/pokemon", () => {

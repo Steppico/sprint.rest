@@ -17,11 +17,11 @@ const server = () => {
     res.send(pokeData.pokemon);
   });
   app.get("/api/pokemon/:idOrName", (req, res) => {
-    const item = req.params;
-    const poke = pokeData.pokemon[Number(item.idOrName) - 1];
+    const item = req.params.idOrName;
+    const poke = pokeData.pokemon[Number(item) - 1];
     if (poke === undefined) {
       for (let i = 0; i < pokeData.pokemon.length; i++) {
-        if (pokeData.pokemon[i].name === item.idOrName) {
+        if (pokeData.pokemon[i].name === item) {
           res.send(pokeData.pokemon[i]);
         }
       }
@@ -31,16 +31,17 @@ const server = () => {
   // TO SOLVE
   app.get("/api/pokemon/:idOrName/evolutions", (req, res) => {
     const param = req.params.idOrName;
-    console.log(param);
-    let poke = pokeData.pokemon[Number(param)].evolutions;
+    let poke = pokeData.pokemon[Number(param)];
     if (poke === undefined) {
       for (let i = 0; i < pokeData.pokemon.length; i++) {
-        if (pokeData.pokemon[i] === param) {
-          poke = pokeData.pokemon[i].evolutions;
+        if (pokeData.pokemon[i].evolutions) {
+          if (pokeData.pokemon[i].name === param) {
+            poke = pokeData.pokemon[i];
+          }
         }
       }
     }
-    res.send(poke);
+    res.send(poke.evolutions);
   });
 
   app.post("/api/pokemon", (req, res) => {
@@ -65,10 +66,8 @@ const server = () => {
   });
 
   app.delete("/api/pokemon/:idOrName", (req, res) => {
-    const deletion = req.params;
-    const pokeBye = pokeData.pokemon[Number(deletion.idOrName) - 1];
-    // console.log(pokeBye);
-    res.send(pokeData.pokemon.splice(Number(deletion.idOrName) - 1, 1));
+    const deletion = req.params.idOrName;
+    res.send(pokeData.pokemon.splice(Number(deletion) - 1, 1));
   });
 
   return app;
