@@ -28,7 +28,6 @@ const server = () => {
     }
     res.send(poke);
   });
-  // TO SOLVE
   app.get("/api/pokemon/:idOrName/evolutions", (req, res) => {
     const param = req.params.idOrName;
     let poke = pokeData.pokemon[Number(param)];
@@ -42,6 +41,21 @@ const server = () => {
       }
     }
     res.send(poke.evolutions);
+  });
+
+  app.get("/api/pokemon/:idOrName/evolutions/previous", (req, res) => {
+    const param = req.params.idOrName;
+    let poke = pokeData.pokemon[param - 1];
+    if (poke === undefined) {
+      for (let i = 0; i < pokeData.pokemon.length; i++) {
+        if (pokeData.pokemon[i]["Previous evolution(s)"]) {
+          if (pokeData.pokemon[i].name === param) {
+            poke = pokeData.pokemon[i];
+          }
+        }
+      }
+    }
+    res.send(poke["Previous evolution(s)"]);
   });
 
   app.post("/api/pokemon", (req, res) => {

@@ -50,6 +50,18 @@ describe("Pokemon API Server", () => {
       const evolutions = pokeData.pokemon[24].evolutions;
       expect(res.body).to.deep.equal(evolutions);
     });
+    it("should return an evolved pokemon's previous evolution", async () => {
+      const res = await request.get("/api/pokemon/17/evolutions/previous");
+      const previous = pokeData.pokemon[16]["Previous evolution(s)"];
+      expect(res.body).to.deep.equal(previous);
+    });
+    it("should return an evolved pokemon's previous evolution, by name", async () => {
+      const res = await request.get(
+        "/api/pokemon/Pidgeotto/evolutions/previous"
+      );
+      const previous = pokeData.pokemon[16]["Previous evolution(s)"];
+      expect(res.body).to.deep.equal(previous);
+    });
   });
   describe("POST /api/pokemon", () => {
     it("should add a pokemon", async () => {
@@ -105,7 +117,7 @@ describe("Pokemon API Server", () => {
       expect(res.body[99].type).to.equal("water");
     });
   });
-  describe("DELETE /api/pokemon/:idOrName", () => {
+  xdescribe("DELETE /api/pokemon/:idOrName", () => {
     it("should return the deleted pokemon", async () => {
       const res = await request.delete("/api/pokemon/1");
       expect(res.body[0].name).to.equal("Bulbasaur");
