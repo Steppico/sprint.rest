@@ -127,4 +127,26 @@ describe("Pokemon API Server", () => {
       expect(res.body[0].name).not.to.equal("Bulbasaur");
     });
   });
+  describe("GET /api/types", () => {
+    it("should get all types", async () => {
+      const res = await request.get("/api/types");
+      const result = pokeData.types;
+      expect(res.body).to.deep.equal(result);
+    });
+    it("should return n types when limit is set", async () => {
+      const res = await request.get("/api/types?limit=5");
+      const limit = [];
+      for (let i = 0; i < 5; i++) {
+        limit.push(pokeData.types[i]);
+      }
+      expect(res.body).to.deep.equal(limit);
+    });
+  });
+  describe("POST, /api/types", () => {
+    it("should add a new type", async () => {
+      const newType = { type: "Dark" };
+      const res = await request.post("/api/types").send(newType);
+      expect(res.body[res.body.length - 1]).to.deep.equal(newType.type);
+    });
+  });
 });

@@ -13,8 +13,9 @@ const server = () => {
         result.push(pokeData.pokemon[i]);
       }
       res.send(result);
+    } else {
+      res.send(pokeData.pokemon);
     }
-    res.send(pokeData.pokemon);
   });
   app.get("/api/pokemon/:idOrName", (req, res) => {
     const item = req.params.idOrName;
@@ -82,6 +83,25 @@ const server = () => {
   app.delete("/api/pokemon/:idOrName", (req, res) => {
     const deletion = req.params.idOrName;
     res.send(pokeData.pokemon.splice(Number(deletion) - 1, 1));
+  });
+
+  app.get("/api/types", (req, res) => {
+    if (req.query.limit) {
+      const limit = req.query.limit;
+      const result = [];
+      for (let i = 0; i < limit; i++) {
+        result.push(pokeData.types[i]);
+      }
+      res.send(result);
+    } else {
+      res.send(pokeData.types);
+    }
+  });
+
+  app.post("/api/types", (req, res) => {
+    console.log(req.body.type);
+    pokeData.types.push(req.body.type);
+    res.send(pokeData.types);
   });
 
   return app;
