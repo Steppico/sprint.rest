@@ -141,6 +141,10 @@ describe("Pokemon API Server", () => {
       }
       expect(res.body).to.deep.equal(limit);
     });
+    it("should return the number of pokemon by type", async () => {
+      const res = await request.get("/api/types/Grass/pokemon");
+      expect(res.body.length).to.equal(15);
+    });
   });
   describe("POST, /api/types", () => {
     it("should add a new type", async () => {

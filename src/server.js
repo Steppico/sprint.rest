@@ -110,8 +110,29 @@ const server = () => {
   });
   app.delete("/api/types/:name", (req, res) => {
     console.log(req.params.name);
+    let deleted = "";
+    for (let i = 0; i < pokeData.types.length; i++) {
+      if (pokeData.types[i] === req.params.name) {
+        deleted = pokeData.types.splice(i, 1);
+      }
+    }
+    res.send(deleted[0]);
   });
-
+  app.get("/api/types/:type/pokemon", (req, res) => {
+    const filter = req.params.type;
+    const result = [];
+    for (let i = 0; i < pokeData.pokemon.length; i++) {
+      pokeData.pokemon[i].types.forEach((type) => {
+        if (type === filter) {
+          result.push({
+            id: pokeData.pokemon[i].id,
+            name: pokeData.pokemon[i].name,
+          });
+        }
+      });
+    }
+    res.send(result);
+  });
   return app;
 };
 
