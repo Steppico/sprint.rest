@@ -165,6 +165,94 @@ describe("Pokemon API Server", () => {
 
         expect(res.body).to.deep.equal(attacks);
       });
+      it("should return n attacks", async () => {
+        const res = await request.get("/api/attacks").query({ limit: 12 });
+        const result = {};
+        const fast = [];
+        for (let i = 0; i < 12; i++) {
+          fast.push(pokeData.attacks.fast[i]);
+        }
+        result.fast = fast;
+        expect(res.body).to.deep.equal(result);
+      });
+      it("should retrieve only fast attacks", async () => {
+        const res = await request.get("/api/attacks/fast");
+        const fast = pokeData.attacks.fast;
+        expect(res.body).to.deep.equal(fast);
+      });
+      it("should retrieve n fast attacks", async () => {
+        const res = await request.get("/api/attacks/fast").query({ limit: 2 });
+        const fast = [];
+        for (let i = 0; i < 2; i++) {
+          fast.push(pokeData.attacks.fast[i]);
+        }
+        expect(res.body).to.deep.equal(fast);
+      });
+      it("should retrieve only special attacks", async () => {
+        const res = await request.get("/api/attacks/special");
+        const special = pokeData.attacks.special;
+        expect(res.body).to.deep.equal(special);
+      });
+      it("should retrieve n special attacks", async () => {
+        const res = await request
+          .get("/api/attacks/special")
+          .query({ limit: 2 });
+        const special = [];
+        for (let i = 0; i < 2; i++) {
+          special.push(pokeData.attacks.special[i]);
+        }
+        expect(res.body).to.deep.equal(special);
+      });
+      it("should retrieve an attack by its name", async () => {
+        const res = await request.get("/api/attacks/Sludge Bomb");
+        const expected = pokeData.attacks.special[2];
+        expect(res.body).to.deep.equal(expected);
+      });
+      it("should retrieve all pokemons that have the same attacks", async () => {
+        const res = await request.get("/api/attacks/Vine Whip/pokemon");
+        expect(res.body.length).to.equal(5);
+      });
+    });
+    describe("POST /api/attacks", () => {
+      it("should add an attack to fast", async () => {
+        const atk = { name: "RINA SLAP", type: "Destructive", damage: 999 };
+        const res = await request.post("/api/attacks/fast").send(atk);
+        expect(res.body[res.body.length - 1]).to.deep.equal(atk);
+      });
+      it("should add an attack to special", async () => {
+        const attack = { name: "Stefano Uppercut", type: "nyao", damage: 1000 };
+        const res = await request.post("/api/attacks/special").send(attack);
+        expect(res.body[res.body.length - 1]).to.deep.equal(attack);
+      });
+    });
+    describe("PATCH /api/attacks", () => {
+      it("should modify an existing attack", async () => {
+        const res = await request
+          .patch("/api/attacks/Razor Leaf")
+          .send({ name: "Razor LEAVES" });
+
+        expect(res.body.name).to.equal("Razor LEAVES");
+      });
+    });
+    describe("DELETE /api/attacks", () => {
+      it("should delete a fast attack", async () => {
+        const res = await request.delete("/api/attacks/Bug Bite");
+
+        expect(res.body).to.deep.equal({
+          name: "Bug Bite",
+          type: "Bug",
+          damage: 5,
+        });
+      });
+      it("should delete a special attack", async () => {
+        const res = await request.delete("/api/attacks/Solar Beam");
+
+        expect(res.body).to.deep.equal({
+          name: "Solar Beam",
+          type: "Grass",
+          damage: 120,
+        });
+      });
     });
   });
 });

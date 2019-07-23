@@ -30,23 +30,15 @@ const server = () => {
     res.send(poke);
   });
   app.get("/api/pokemon/:idOrName/evolutions", (req, res) => {
-    const param = req.params.idOrName;
-    let poke;
-    for (const key of pokeData.pokemon) {
-      if (Number(key.id) == param) {
-        poke = key;
-      }
-    }
-    if (poke === undefined) {
+    if (isNaN(req.params.idOrName)) {
       for (let i = 0; i < pokeData.pokemon.length; i++) {
-        if (pokeData.pokemon[i].evolutions) {
-          if (pokeData.pokemon[i].name === param) {
-            poke = pokeData.pokemon[i];
-          }
+        if (pokeData.pokemon[i].name === req.params.idOrName) {
+          res.send(pokeData.pokemon[i].evolutions);
         }
       }
+    } else {
+      res.send(pokeData.pokemon[req.params.idOrName].evolutions);
     }
-    res.send(poke.evolutions);
   });
 
   app.get("/api/pokemon/:idOrName/evolutions/previous", (req, res) => {
@@ -132,7 +124,143 @@ const server = () => {
     res.send(result);
   });
   app.get("/api/attacks", (req, res) => {
-    res.send(pokeData.attacks);
+    let atks = {};
+    if (req.query.limit) {
+      const fastAtk = [];
+      const specAtk = [];
+      let limit = req.query.limit;
+      if (limit <= pokeData.attacks.fast.length) {
+        for (let i = 0; i < limit; i++) {
+          fastAtk.push(pokeData.attacks.fast[i]);
+        }
+        atks.fast = fastAtk;
+      } else if (limit > pokeData.attacks.fast.length) {
+        limit -= pokeData.attacks.fast.length;
+        for (let i = 0; i < limit; i++) {
+          specAtk.push(pokeData.attacks.special[i]);
+        }
+        atks.fast = pokeData.attacks.fast;
+        atks.special = specAtk;
+      }
+    } else {
+      atks = pokeData.attacks;
+    }
+    res.send(atks);
+  });
+
+  app.get("/api/attacks/fast", (req, res) => {
+    const result = [];
+    if (req.query.limit) {
+      let limit = req.query.limit;
+      if (limit > pokeData.attacks.fast.length) {
+        limit = pokeData.attacks.fast.length;
+      }
+      for (let i = 0; i < limit; i++) {
+        result.push(pokeData.attacks.fast[i]);
+      }
+      res.send(result);
+    } else {
+      res.send(pokeData.attacks.fast);
+    }
+  });
+  app.get("/api/attacks/special", (req, res) => {
+    const result = [];
+    if (req.query.limit) {
+      let limit = req.query.limit;
+      if (limit > pokeData.attacks.special.length) {
+        limit = pokeData.attacks.special.length;
+      }
+      for (let i = 0; i < limit; i++) {
+        result.push(pokeData.attacks.special[i]);
+      }
+      res.send(result);
+    } else {
+      res.send(pokeData.attacks.special);
+    }
+  });
+  app.get("/api/attacks/:name", (req, res) => {
+    const name = req.params.name;
+    const fast = pokeData.attacks.fast;
+    const special = pokeData.attacks.special;
+    for (let i = 0; i < fast.length; i++) {
+      if (fast[i].name === name) {
+        res.send(fast[i]);
+      }
+    }
+    for (let i = 0; i < special.length; i++) {
+      if (special[i].name === name) {
+        res.send(special[i]);
+      }
+    }
+  });
+
+  app.get("/api/attacks/:name/pokemon", (req, res) => {
+    const result = [];
+    pokeData.pokemon.forEach(function(pokemon) {
+      if (pokemon.attacks) {
+        if (pokemon.attacks.fast) {
+          for (let i = 0; i < pokemon.attacks.fast.length; i++) {
+            if (req.params.name === pokemon.attacks.fast[i].name) {
+              result.push({ name: pokemon.name, id: pokemon.id });
+            }
+          }
+        }
+        if (pokemon.attacks.special) {
+          for (let i = 0; i < pokemon.attacks.special.length; i++) {
+            if (req.params.name === pokemon.attacks.special[i].name) {
+              result.push({ name: pokemon.name, id: pokemon.id });
+            }
+          }
+        }
+      }
+    });
+    res.send(result);
+  });
+  app.post("/api/attacks/fast", (req, res) => {
+    pokeData.attacks.fast.push(req.body);
+    res.send(pokeData.attacks.fast);
+  });
+
+  app.post("/api/attacks/special", (req, res) => {
+    pokeData.attacks.special.push(req.body);
+    res.send(pokeData.attacks.special);
+  });
+
+  app.patch("/api/attacks/:name", (req, res) => {
+    const current = req.params.name;
+    const change = req.body;
+    const fast = pokeData.attacks.fast;
+    const special = pokeData.attacks.special;
+
+    for (let i = 0; i < fast.length; i++) {
+      if (fast[i].name === current) {
+        for (const key in change) {
+          fast[i][key] = change[key];
+        }
+        res.send(fast[i]);
+      }
+    }
+    for (let i = 0; i < special.length; i++) {
+      if (special[i].name === current) {
+        for (const key in change) {
+          special[i][key] = change[key];
+        }
+        res.send(special[i]);
+      }
+    }
+  });
+
+  app.delete("/api/attacks/:name", (req, res) => {
+    for (let i = 0; i < pokeData.attacks.fast.length; i++) {
+      if (req.params.name === pokeData.attacks.fast[i].name) {
+        res.send(pokeData.attacks.fast.splice(i, 1)[0]);
+      }
+    }
+    for (let i = 0; i < pokeData.attacks.special.length; i++) {
+      if (req.params.name === pokeData.attacks.special[i].name) {
+        res.send(pokeData.attacks.special.splice(i, 1)[0]);
+      }
+    }
   });
   return app;
 };
