@@ -41,7 +41,7 @@ describe("Pokemon API Server", () => {
       expect(res.body.name).to.deep.equal("Pikachu");
     });
     it("should return the evolutions a Pokemon has, by ID", async () => {
-      const res = await request.get("/api/pokemon/3/evolutions");
+      const res = await request.get("/api/pokemon/4/evolutions");
       const evolutions = pokeData.pokemon[3].evolutions;
       expect(res.body).to.deep.equal(evolutions);
     });
@@ -152,10 +152,18 @@ describe("Pokemon API Server", () => {
       const res = await request.post("/api/types").send(newType);
       expect(res.body[res.body.length - 1]).to.deep.equal(newType.type);
     });
-    describe("DELETE, /api/types:name", () => {
+    xdescribe("DELETE, /api/types:name", () => {
       it("should delete a type", async () => {
         const res = await request.delete("/api/types/Dragon");
-        expect(res.body).to.equal("Dragon");
+        expect(res.body[0]).to.equal("Dragon");
+      });
+    });
+    describe("GET, /api/attacks", () => {
+      it("should return all attacks", async () => {
+        const res = await request.get("/api/attacks");
+        const attacks = pokeData.attacks;
+
+        expect(res.body).to.deep.equal(attacks);
       });
     });
   });

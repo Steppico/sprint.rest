@@ -104,19 +104,17 @@ const server = () => {
   });
 
   app.post("/api/types", (req, res) => {
-    console.log(req.body.type);
     pokeData.types.push(req.body.type);
     res.send(pokeData.types);
   });
   app.delete("/api/types/:name", (req, res) => {
-    console.log(req.params.name);
     let deleted = "";
     for (let i = 0; i < pokeData.types.length; i++) {
       if (pokeData.types[i] === req.params.name) {
         deleted = pokeData.types.splice(i, 1);
       }
     }
-    res.send(deleted[0]);
+    res.send(deleted);
   });
   app.get("/api/types/:type/pokemon", (req, res) => {
     const filter = req.params.type;
@@ -132,6 +130,9 @@ const server = () => {
       });
     }
     res.send(result);
+  });
+  app.get("/api/attacks", (req, res) => {
+    res.send(pokeData.attacks);
   });
   return app;
 };
