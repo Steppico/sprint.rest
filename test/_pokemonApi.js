@@ -148,5 +148,11 @@ describe("Pokemon API Server", () => {
       const res = await request.post("/api/types").send(newType);
       expect(res.body[res.body.length - 1]).to.deep.equal(newType.type);
     });
+    describe("DELETE, /api/types:name", () => {
+      it("should delete a type", async () => {
+        const res = await request.delete("/api/types/Dragon");
+        expect(res.body).to.equal("Dragon");
+      });
+    });
   });
 });

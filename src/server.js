@@ -31,7 +31,12 @@ const server = () => {
   });
   app.get("/api/pokemon/:idOrName/evolutions", (req, res) => {
     const param = req.params.idOrName;
-    let poke = pokeData.pokemon[Number(param)];
+    let poke;
+    for (const key of pokeData.pokemon) {
+      if (Number(key.id) == param) {
+        poke = key;
+      }
+    }
     if (poke === undefined) {
       for (let i = 0; i < pokeData.pokemon.length; i++) {
         if (pokeData.pokemon[i].evolutions) {
@@ -102,6 +107,9 @@ const server = () => {
     console.log(req.body.type);
     pokeData.types.push(req.body.type);
     res.send(pokeData.types);
+  });
+  app.delete("/api/types/:name", (req, res) => {
+    console.log(req.params.name);
   });
 
   return app;
