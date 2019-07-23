@@ -30,15 +30,27 @@ const server = () => {
     res.send(poke);
   });
   app.get("/api/pokemon/:idOrName/evolutions", (req, res) => {
-    if (isNaN(req.params.idOrName)) {
+    const param = req.params.idOrName;
+    let poke;
+
+    let realKey;
+    for (const key of pokeData.pokemon) {
+      realKey = Number(key.id);
+      if (realKey === Number(param)) {
+        poke = key;
+      }
+    }
+
+    if (poke === undefined) {
       for (let i = 0; i < pokeData.pokemon.length; i++) {
-        if (pokeData.pokemon[i].name === req.params.idOrName) {
-          res.send(pokeData.pokemon[i].evolutions);
+        if (pokeData.pokemon[i].evolutions) {
+          if (pokeData.pokemon[i].name === param) {
+            poke = pokeData.pokemon[i];
+          }
         }
       }
-    } else {
-      res.send(pokeData.pokemon[req.params.idOrName].evolutions);
     }
+    res.send(poke.evolutions);
   });
 
   app.get("/api/pokemon/:idOrName/evolutions/previous", (req, res) => {
